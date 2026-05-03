@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>⏱ Demi-fond EPS</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
+html,body{height:100%;font-family:-apple-system,system-ui,'Helvetica Neue',sans-serif;background:#f1f5f9;color:#0f172a;overscroll-behavior:none}
+#app{display:flex;flex-direction:column;height:100%;max-width:640px;margin:0 auto}
+#main{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:calc(env(safe-area-inset-bottom) + 4px)}
+nav{display:flex;background:#1e293b;border-top:1px solid #334155;padding-bottom:env(safe-area-inset-bottom);flex-shrink:0}
+.nav-btn{flex:1;border:none;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 4px;gap:3px;font-family:inherit;color:#64748b;border-top:2px solid transparent;font-size:10px;font-weight:600;letter-spacing:.3px;text-transform:uppercase}
+.nav-btn.active{color:#34d399;border-top-color:#34d399}
+.nav-icon{font-size:20px;line-height:1}
+.hdr{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid #e2e8f0;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;min-height:54px}
+.hdr-title{font-size:19px;font-weight:700}
+.back-bar{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid #e2e8f0;padding:12px 16px;display:flex;align-items:center;gap:8px;min-height:52px}
+.back-btn{border:none;background:none;color:#3b82f6;font-size:15px;cursor:pointer;padding:4px 0;font-family:inherit;font-weight:500;white-space:nowrap}
+.back-title{font-weight:700;font-size:15px;text-align:center;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sec{padding:14px 16px}
+.lbl{font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.8px;margin-bottom:7px}
+.card{background:#fff;border-radius:14px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.card-title{font-weight:700;font-size:15px}
+.card-sub{font-size:12px;color:#94a3b8;margin-top:3px}
+.input{width:100%;border:1.5px solid #e2e8f0;border-radius:10px;padding:12px 14px;font-size:16px;font-family:inherit;color:#0f172a;background:#fff;outline:none;transition:border-color .15s}
+.input:focus{border-color:#3b82f6}
+.input-row{display:flex;gap:8px}
+.input-row .input{flex:1}
+.btn-p{background:#3b82f6;color:#fff;border:none;border-radius:10px;padding:12px 18px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap}
+.btn-p:active{background:#2563eb}
+.btn-s{background:#f1f5f9;color:#475569;border:1.5px solid #e2e8f0;border-radius:10px;padding:10px 14px;font-size:14px;cursor:pointer;font-family:inherit}
+.btn-s:active{background:#e2e8f0}
+.btn-d{background:#fff;color:#ef4444;border:1.5px solid #fecaca;border-radius:10px;padding:10px 12px;font-size:14px;cursor:pointer;font-family:inherit}
+.btn-start{width:100%;height:64px;background:#16a34a;color:#fff;border:none;border-radius:16px;font-size:20px;font-weight:800;cursor:pointer;font-family:inherit;letter-spacing:.3px}
+.btn-start:active{background:#15803d;transform:scale(.98)}
+.empty{text-align:center;padding:48px 16px;color:#cbd5e1;font-size:15px}
+.tag{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;margin:2px}
+.chip{display:inline-flex;align-items:center;padding:7px 13px;border-radius:20px;cursor:pointer;font-size:14px;font-weight:600;user-select:none;border:2px solid;transition:all .1s}
+.chip:active{transform:scale(.94)}
+.tab-strip{display:flex;gap:8px;padding:9px 12px;overflow-x:auto;-webkit-overflow-scrolling:touch;background:#f8fafc;border-bottom:1px solid #e2e8f0;flex-shrink:0}
+.tab-strip::-webkit-scrollbar{display:none}
+.tab-pill{padding:7px 16px;border-radius:20px;border:2px solid #e2e8f0;background:#fff;cursor:pointer;font-size:14px;font-weight:700;white-space:nowrap;color:#64748b;font-family:inherit}
+.tab-pill.active{color:#fff;border-color:transparent}
+.tab-pill:active{transform:scale(.95)}
+.status-bar{margin:10px 12px;background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:14px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between}
+.elapsed{font-family:'Courier New',monospace;font-size:18px;font-weight:700;color:#15803d}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 12px 16px}
+.stu-card{border-radius:14px;padding:12px 10px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:108px;border:2px solid;transition:border-color .1s,background .1s}
+.stu-card.waiting{background:#fff;border-color:#e2e8f0}
+.stu-card.running{background:#fffbeb;border-color:#fcd34d;cursor:pointer}
+.stu-card.running:active{background:#fef9c3}
+.stu-card.done{background:#f0fdf4;border-color:#86efac}
+.stu-card.absent{background:#f8fafc;border-color:#e2e8f0;opacity:.7}
+.stu-card.np{background:#fefce8;border-color:#fde047;opacity:.8}
+.stu-name{font-weight:700;font-size:14px;color:#1e293b;line-height:1.2}
+.stu-time{font-family:'Courier New',monospace;font-size:22px;font-weight:700;line-height:1}
+.stu-speed{font-size:13px;font-weight:600}
+.stu-pace{font-size:12px;color:#94a3b8}
+.stu-hint{font-size:10px;color:#f59e0b;font-weight:700;letter-spacing:.3px;text-transform:uppercase}
+.stu-wait-txt{font-size:12px;color:#cbd5e1}
+.status-btns{display:flex;gap:5px;margin-top:4px}
+.sbtn{font-size:11px;font-weight:700;padding:4px 8px;border-radius:6px;border:1.5px solid;cursor:pointer;font-family:inherit;line-height:1}
+.sbtn-abs{background:#fee2e2;color:#b91c1c;border-color:#fecaca}
+.sbtn-np{background:#fef9c3;color:#92400e;border-color:#fde047}
+.undo-btn{font-size:10px;color:#94a3b8;background:none;border:none;cursor:pointer;padding:2px 4px;font-family:inherit;text-decoration:underline;margin-top:2px}
+.res-wrap{padding:12px 12px 16px;overflow-x:auto}
+.res-table{width:100%;border-collapse:collapse;font-size:13px;min-width:340px}
+.res-table th{background:#1e293b;color:#94a3b8;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;padding:8px 10px;text-align:left;white-space:nowrap}
+.res-table th:not(:first-child){text-align:center}
+.res-table td{padding:9px 10px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
+.res-table td:not(:first-child){text-align:center}
+.res-table tr:last-child td{border-bottom:none}
+.res-table tr:hover td{background:#f8fafc}
+.td-name{font-weight:600;font-size:14px;color:#1e293b}
+.td-num{width:28px;color:#94a3b8;font-weight:700;font-size:12px}
+.td-time{font-family:'Courier New',monospace;font-weight:700;font-size:13px;color:#0f172a}
+.td-speed{font-size:12px;color:#0891b2;font-weight:600;margin-top:2px}
+.td-avg{font-family:'Courier New',monospace;font-weight:700;font-size:13px;color:#7c3aed}
+.td-cross{font-size:18px;color:#e2e8f0;font-weight:700}
+.td-cross.abs{color:#fca5a5}
+.td-cross.np{color:#fde047}
+.td-dash{color:#e2e8f0;font-size:16px}
+.grp-hdr{font-weight:700;font-size:14px;padding:14px 16px 8px;border-top:1px solid #e2e8f0;margin-top:4px}
+.grp-count{font-size:12px;color:#94a3b8;margin-left:8px;font-weight:400}
+.awards-wrap{padding:12px 12px 24px}
+.awards-btn{width:100%;padding:16px;background:#fffbeb;border:2px dashed #fcd34d;border-radius:16px;font-size:17px;font-weight:700;cursor:pointer;font-family:inherit;color:#92400e;margin-bottom:12px}
+.awards-btn:active{background:#fef9c3}
+.award-card{background:#fff;border-radius:14px;padding:14px 16px;margin-bottom:8px;box-shadow:0 1px 3px rgba(0,0,0,.06);border-left:4px solid}
+.award-emoji{font-size:28px;flex-shrink:0}
+.award-title{font-weight:700;font-size:14px;color:#0f172a}
+.award-name{font-size:16px;font-weight:800;color:#1e293b;margin-top:2px}
+.award-desc{font-size:12px;color:#94a3b8;margin-top:2px}
+select.input{-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px}
+.bulk-area{width:100%;border:1.5px solid #e2e8f0;border-radius:10px;padding:12px 14px;font-size:15px;font-family:inherit;color:#0f172a;background:#fff;outline:none;resize:vertical;min-height:130px}
+.bulk-area:focus{border-color:#3b82f6}
+.stu-list-item{background:#fff;border-radius:10px;padding:11px 14px;margin-bottom:8px;display:flex;align-items:center;gap:10px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.run-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.run-input{width:90px;border:1.5px solid #e2e8f0;border-radius:10px;padding:10px 12px;font-size:16px;font-family:inherit;outline:none;text-align:center}
+.run-input:focus{border-color:#3b82f6}
+.grp-count-btn{width:46px;height:46px;border-radius:10px;border:2px solid #e2e8f0;background:#fff;cursor:pointer;font-size:17px;font-weight:800;font-family:inherit;color:#64748b}
+.grp-count-btn:active{transform:scale(.92)}
+.grp-count-btn.active{color:#fff;border-color:transparent}
+.chips-wrap{display:flex;flex-wrap:wrap;gap:8px}
+.grp-summary{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px}
+.grp-sum-item{font-size:13px;font-weight:700}
+.toggle-view{display:flex;gap:6px;justify-content:center;padding:10px 12px}
+.tvbtn{padding:7px 20px;border-radius:20px;border:1.5px solid #e2e8f0;background:#fff;cursor:pointer;font-size:13px;font-weight:700;font-family:inherit;color:#64748b}
+.tvbtn.active{background:#0f172a;color:#fff;border-color:#0f172a}
+</style>
+</head>
+<body>
+<div id="app">
+  <main id="main"></main>
+  <nav>
+    <button class="nav-btn active" data-tab="classes" onclick="switchTab('classes')">
+      <span class="nav-icon">👥</span>Classes
+    </button>
+    <button class="nav-btn" data-tab="lessons" onclick="switchTab('lessons')">
+      <span class="nav-icon">📋</span>Leçons
+    </button>
+    <button class="nav-btn" data-tab="chrono" onclick="switchTab('chrono')">
+      <span class="nav-icon">⏱</span>Chrono
+    </button>
+  </nav>
+</div>
+<script>
+const GRPS=['A','B','C','D','E'];
+const GCOL=['#3b82f6','#ef4444','#22c55e','#f59e0b','#a855f7'];
+const GLGT=['#eff6ff','#fef2f2','#f0fdf4','#fffbeb','#faf5ff'];
+const GBDR=['#bfdbfe','#fecaca','#bbf7d0','#fde68a','#e9d5ff'];
+const uid=()=>Math.random().toString(36).slice(2,9);
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+/* ── State ──────────────────────────────────────── */
+let S={tab:'classes',clsScreen:'list',clsDetail:null,lesScreen:'list',lesEditing:null,chrScreen:'pick',chrLessonId:null,chrGroupId:null,chrRunIdx:0,chrView:'timing',classes:[],lessons:[],sessions:{}};
+let timerInt=null;
+
+/* ── Storage ────────────────────────────────────── */
+function load(){try{const c=localStorage.getItem('df4-cls'),l=localStorage.getItem('df4-les'),s=localStorage.getItem('df4-ses');if(c)S.classes=JSON.parse(c);if(l)S.lessons=JSON.parse(l);if(s)S.sessions=JSON.parse(s);}catch(e){}}
+function saveCls(){localStorage.setItem('df4-cls',JSON.stringify(S.classes))}
+function saveLes(){localStorage.setItem('df4-les',JSON.stringify(S.lessons))}
+function saveSes(){localStorage.setItem('df4-ses',JSON.stringify(S.sessions))}
+
+/* ── Formatters ─────────────────────────────────── */
+function fmtT(ms){if(ms==null||ms<0)return'--:--.—';const m=String(Math.floor(ms/60000)).padStart(2,'0'),s=String(Math.floor(ms%60000/1000)).padStart(2,'0'),d=Math.floor(ms%1000/100);return`${m}:${s}.${d}`;}
+function fmtV(dist,ms){if(!dist||!ms||ms<=0)return null;return`${((dist/(ms/1000))*3.6).toFixed(1)} km/h`;}
+function fmtVNum(dist,ms){if(!dist||!ms||ms<=0)return null;return(dist/(ms/1000))*3.6;}
+function fmtP(dist,ms){if(!dist||!ms||ms<=0)return null;const kph=(dist/(ms/1000))*3.6,p=60/kph;return`${Math.floor(p)}'${String(Math.round((p%1)*60)).padStart(2,'0')}"`;}
+
+/* ── Navigation ─────────────────────────────────── */
+function switchTab(tab){S.tab=tab;document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));render();}
+function render(){const m=document.getElementById('main');if(S.tab==='classes')renderClasses(m);else if(S.tab==='lessons')renderLessons(m);else renderChrono(m);}
+
+/* ════════════════════════════════════════════════
+   CLASSES
+════════════════════════════════════════════════ */
+function renderClasses(m){
+  if(S.clsScreen==='detail'){renderClassDetail(m);return;}
+  m.innerHTML=`<div class="hdr"><span class="hdr-title">Classes</span></div>
+<div class="sec"><div class="lbl">Nouvelle classe</div>
+<div class="input-row"><input class="input" id="new-cls-name" placeholder="Ex : 2nde A" onkeydown="if(event.key==='Enter')addClass()">
+<button class="btn-p" onclick="addClass()">Ajouter</button></div></div>
+<div id="cls-list" style="padding:0 12px 16px"></div>`;
+  renderClsList();
+}
+function renderClsList(){
+  const el=document.getElementById('cls-list');if(!el)return;
+  if(!S.classes.length){el.innerHTML='<div class="empty">Aucune classe.</div>';return;}
+  el.innerHTML=S.classes.map(c=>`<div class="card" onclick="openClass('${c.id}')">
+<div style="flex:1"><div class="card-title">${esc(c.name)}</div><div class="card-sub">${c.students.length} élève${c.students.length!==1?'s':''}</div></div>
+<span style="color:#94a3b8;font-size:22px;margin-right:2px">›</span>
+<button class="btn-d" onclick="event.stopPropagation();deleteClass('${c.id}')">✕</button></div>`).join('');
+}
+function addClass(){const inp=document.getElementById('new-cls-name'),n=inp.value.trim();if(!n)return;S.classes.push({id:uid(),name:n,students:[]});saveCls();inp.value='';renderClsList();}
+function deleteClass(id){if(!confirm('Supprimer cette classe ?'))return;S.classes=S.classes.filter(c=>c.id!==id);saveCls();renderClsList();}
+function openClass(id){S.clsScreen='detail';S.clsDetail=id;render();}
+function renderClassDetail(m){
+  const cls=S.classes.find(c=>c.id===S.clsDetail);if(!cls){S.clsScreen='list';render();return;}
+  m.innerHTML=`<div class="back-bar"><button class="back-btn" onclick="S.clsScreen='list';render()">← Classes</button>
+<span class="back-title">${esc(cls.name)}</span><div style="width:64px"></div></div>
+<div class="sec"><div class="lbl">Nom</div>
+<input class="input" id="cls-name-inp" value="${esc(cls.name)}" onblur="saveClsName()" style="font-size:18px;font-weight:700"></div>
+<div class="sec" style="padding-top:0"><div class="lbl">Ajouter un élève</div>
+<div class="input-row"><input class="input" id="new-stu-name" placeholder="Prénom NOM" onkeydown="if(event.key==='Enter')addStudent()">
+<button class="btn-p" onclick="addStudent()">+</button></div>
+<button class="btn-s" style="width:100%;margin-top:8px" onclick="toggleBulk()">📋 Importer liste (coller)</button></div>
+<div id="bulk-zone" style="display:none;padding:0 16px 12px">
+<div class="lbl">Un élève par ligne</div>
+<textarea class="bulk-area" id="bulk-txt" placeholder="Martin Lucas&#10;Dupont Emma&#10;..."></textarea>
+<div class="input-row" style="margin-top:8px"><button class="btn-p" onclick="doBulkImport()">Importer</button>
+<button class="btn-s" onclick="toggleBulk()">Annuler</button></div></div>
+<div id="stu-list" style="padding:0 12px 16px"></div>`;
+  renderStuList(cls);
+}
+function renderStuList(cls){const el=document.getElementById('stu-list');if(!el)return;if(!cls.students.length){el.innerHTML='<div class="empty">Aucun élève</div>';return;}
+el.innerHTML=cls.students.map((st,i)=>`<div class="stu-list-item"><span style="width:22px;color:#cbd5e1;font-size:13px;font-weight:600">${i+1}</span><span style="flex:1;font-size:15px">${esc(st.name)}</span><button class="btn-d" onclick="deleteStudent('${cls.id}','${st.id}')">✕</button></div>`).join('');}
+function saveClsName(){const cls=S.classes.find(c=>c.id===S.clsDetail),n=document.getElementById('cls-name-inp')?.value.trim();if(cls&&n){cls.name=n;saveCls();}}
+function addStudent(){const cls=S.classes.find(c=>c.id===S.clsDetail),inp=document.getElementById('new-stu-name'),n=inp?.value.trim();if(!cls||!n)return;cls.students.push({id:uid(),name:n});saveCls();inp.value='';renderStuList(cls);}
+function deleteStudent(cid,sid){const cls=S.classes.find(c=>c.id===cid);if(!cls)return;cls.students=cls.students.filter(s=>s.id!==sid);saveCls();renderStuList(cls);}
+function toggleBulk(){const z=document.getElementById('bulk-zone');z.style.display=z.style.display==='none'?'block':'none';}
+function doBulkImport(){const cls=S.classes.find(c=>c.id===S.clsDetail),txt=document.getElementById('bulk-txt')?.value,names=txt?.split('\n').map(n=>n.trim()).filter(Boolean)||[];if(!cls||!names.length)return;names.forEach(n=>cls.students.push({id:uid(),name:n}));saveCls();document.getElementById('bulk-txt').value='';document.getElementById('bulk-zone').style.display='none';renderStuList(cls);}
+
+/* ════════════════════════════════════════════════
+   LESSONS
+════════════════════════════════════════════════ */
+function renderLessons(m){
+  if(S.lesScreen==='form'){renderLessonForm(m);return;}
+  m.innerHTML=`<div class="hdr"><span class="hdr-title">Leçons</span>
+<button class="btn-p" onclick="S.lesScreen='form';S.lesEditing=null;render()">+ Nouvelle</button></div>
+<div id="les-list" style="padding:12px 12px 16px"></div>`;
+  renderLesList();
+}
+function renderLesList(){
+  const el=document.getElementById('les-list');if(!el)return;
+  if(!S.lessons.length){el.innerHTML='<div class="empty">Aucune leçon.</div>';return;}
+  el.innerHTML=S.lessons.map(l=>{
+    const cls=S.classes.find(c=>c.id===l.classId);
+    const runs=l.runs.map(r=>r.dist+'m').join(' + ');
+    const tags=l.groups.map((g,i)=>`<span class="tag" style="background:${GLGT[i]};color:${GCOL[i]};border:1px solid ${GBDR[i]}">Grp ${g.id} (${g.studentIds.length})</span>`).join('');
+    return`<div class="card" style="flex-direction:column;align-items:stretch">
+<div style="display:flex;align-items:flex-start;gap:8px">
+<div style="flex:1"><div class="card-title">${esc(l.name)}</div><div class="card-sub">${cls?esc(cls.name):'—'} · ${esc(runs)}</div>
+<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px">${tags}</div></div>
+<button class="btn-s" style="padding:8px 10px" onclick="editLesson('${l.id}')">✏️</button>
+<button class="btn-d" style="padding:8px 10px" onclick="deleteLesson('${l.id}')">✕</button></div></div>`;
+  }).join('');
+}
+function editLesson(id){S.lesEditing=S.lessons.find(l=>l.id===id)||null;S.lesScreen='form';render();}
+function deleteLesson(id){if(!confirm('Supprimer ?'))return;S.lessons=S.lessons.filter(l=>l.id!==id);saveLes();renderLesList();}
+
+/* ── Lesson Form ── */
+let F={name:'',classId:'',runs:[],nGroups:2,assignments:{}};
+function renderLessonForm(m){
+  const ed=S.lesEditing;
+  F={name:ed?.name||'',classId:ed?.classId||(S.classes[0]?.id||''),runs:ed?ed.runs.map(r=>({...r})):[{id:uid(),dist:250},{id:uid(),dist:500},{id:uid(),dist:250}],nGroups:ed?.groups?.length||2,assignments:ed?{...ed.assignments}:{}};
+  m.innerHTML=`<div class="back-bar"><button class="back-btn" onclick="S.lesScreen='list';render()">← Annuler</button>
+<span class="back-title">${ed?'Modifier':'Nouvelle leçon'}</span>
+<button class="btn-p" style="font-size:13px;padding:8px 14px" onclick="saveLesson()">Enregistrer</button></div>
+<div class="sec"><div class="lbl">Nom</div>
+<input class="input" id="f-name" value="${esc(F.name)}" placeholder="Ex : Pyramide – 2nde A"></div>
+<div class="sec" style="padding-top:0"><div class="lbl">Classe</div>
+<select class="input" id="f-class" onchange="formClsChange()">${S.classes.length?S.classes.map(c=>`<option value="${c.id}" ${c.id===F.classId?'selected':''}>${esc(c.name)}</option>`).join(''):'<option value="">— Aucune classe —</option>'}</select></div>
+<div class="sec" style="padding-top:0"><div class="lbl">Courses</div>
+<div id="f-runs"></div>
+<button class="btn-s" style="margin-top:2px" onclick="addRun()">+ Ajouter une course</button></div>
+<div class="sec" style="padding-top:0"><div class="lbl">Nombre de groupes</div>
+<div style="display:flex;gap:8px" id="f-grp-btns"></div>
+<div style="font-size:12px;color:#94a3b8;margin-top:8px">La répartition se fait automatiquement par ordre de la liste.</div></div>
+<div class="sec" style="padding-top:0" id="f-assign-zone"></div>`;
+  renderFRuns();renderFGrpBtns();doAutoAssign();
+}
+function renderFRuns(){const el=document.getElementById('f-runs');if(!el)return;el.innerHTML=F.runs.map((r,i)=>`<div class="run-row"><span style="color:#94a3b8;font-size:14px;width:20px">${i+1}.</span><input class="run-input" type="number" min="50" max="5000" value="${r.dist}" onchange="updateRunDist('${r.id}',this.value)" oninput="updateRunDist('${r.id}',this.value)"><span style="color:#64748b;font-size:14px">m</span>${F.runs.length>1?`<button class="btn-d" style="padding:8px 10px" onclick="removeRun('${r.id}')">✕</button>`:''}</div>`).join('');}
+function renderFGrpBtns(){const el=document.getElementById('f-grp-btns');if(!el)return;el.innerHTML=[1,2,3,4,5].map((n,i)=>`<button class="grp-count-btn${F.nGroups===n?' active':''}" style="${F.nGroups===n?`background:${GCOL[n-1]};border-color:${GCOL[n-1]}`:''}" onclick="setNGroups(${n})">${n}</button>`).join('');}
+function renderFAssign(){
+  const el=document.getElementById('f-assign-zone');if(!el)return;
+  const cls=S.classes.find(c=>c.id===F.classId);if(!cls||!cls.students.length){el.innerHTML='';return;}
+  const counts=Array.from({length:F.nGroups},(_,i)=>cls.students.filter(s=>F.assignments[s.id]===i).length);
+  el.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+<div class="lbl" style="margin-bottom:0">Répartition (${cls.students.length} élèves)</div>
+<button class="btn-s" style="padding:6px 12px;font-size:13px" onclick="doAutoAssign()">⚡ Répartir auto</button></div>
+<div class="chips-wrap" id="f-chips">${cls.students.map(st=>{const g=F.assignments[st.id];const hasG=g!==undefined&&g<F.nGroups;return`<div class="chip" id="chip-${st.id}" style="background:${hasG?GLGT[g]:'#f1f5f9'};color:${hasG?GCOL[g]:'#94a3b8'};border-color:${hasG?GCOL[g]:'#e2e8f0'}" onclick="cycleStudent('${st.id}')">${hasG?GRPS[g]+' – ':''}${esc(st.name)}</div>`;}).join('')}</div>
+<div class="grp-summary" id="f-grp-sum">${Array.from({length:F.nGroups},(_,i)=>`<span class="grp-sum-item" style="color:${GCOL[i]}">● Groupe ${GRPS[i]}: ${counts[i]}</span>`).join('')}</div>`;}
+function addRun(){F.runs.push({id:uid(),dist:250});renderFRuns();}
+function removeRun(id){F.runs=F.runs.filter(r=>r.id!==id);renderFRuns();}
+function updateRunDist(id,val){const r=F.runs.find(x=>x.id===id);if(r)r.dist=parseInt(val)||0;}
+function setNGroups(n){F.nGroups=n;F.assignments={};renderFGrpBtns();doAutoAssign();}
+function formClsChange(){F.classId=document.getElementById('f-class').value;F.assignments={};doAutoAssign();}
+function doAutoAssign(){
+  const cls=S.classes.find(c=>c.id===F.classId);if(!cls)return;
+  const n=cls.students.length,ng=F.nGroups;
+  // Distribute by chunks in order of entry
+  cls.students.forEach((st,i)=>{F.assignments[st.id]=Math.min(Math.floor(i*ng/n),ng-1);});
+  renderFAssign();
+}
+function cycleStudent(sid){
+  const g=F.assignments[sid];F.assignments[sid]=g===undefined?0:((g+1)%F.nGroups);
+  const cls=S.classes.find(c=>c.id===F.classId);
+  const chip=document.getElementById('chip-'+sid);
+  const ng=F.assignments[sid];
+  chip.style.background=GLGT[ng];chip.style.color=GCOL[ng];chip.style.borderColor=GCOL[ng];
+  chip.textContent=GRPS[ng]+' – '+(cls?.students.find(s=>s.id===sid)?.name||'');
+  const sum=document.getElementById('f-grp-sum');
+  if(sum&&cls)sum.innerHTML=Array.from({length:F.nGroups},(_,i)=>`<span class="grp-sum-item" style="color:${GCOL[i]}">● Groupe ${GRPS[i]}: ${cls.students.filter(s=>F.assignments[s.id]===i).length}</span>`).join('');
+}
+function saveLesson(){
+  const name=document.getElementById('f-name')?.value.trim();if(!name)return alert('Donnez un nom');if(!F.classId)return alert('Sélectionnez une classe');
+  const cls=S.classes.find(c=>c.id===F.classId);
+  document.querySelectorAll('.run-input').forEach((inp,i)=>{if(F.runs[i])F.runs[i].dist=parseInt(inp.value)||F.runs[i].dist;});
+  const groups=Array.from({length:F.nGroups},(_,i)=>({id:GRPS[i],color:GCOL[i],studentIds:(cls?.students||[]).filter(s=>F.assignments[s.id]===i).map(s=>s.id)}));
+  const data={id:S.lesEditing?.id||uid(),name,classId:F.classId,runs:F.runs,groups,assignments:{...F.assignments}};
+  if(S.lesEditing)S.lessons=S.lessons.map(l=>l.id===data.id?data:l);else S.lessons.push(data);
+  saveLes();S.lesScreen='list';S.lesEditing=null;render();
+}
+
+/* ════════════════════════════════════════════════
+   CHRONO
+════════════════════════════════════════════════ */
+function renderChrono(m){if(S.chrScreen==='timing')renderChronoTiming(m);else renderChronoPick(m);}
+function renderChronoPick(m){
+  m.innerHTML=`<div class="hdr"><span class="hdr-title">Chrono</span></div>
+<div class="sec"><div class="lbl">Sélectionner une leçon</div>${!S.lessons.length?'<div class="empty">Aucune leçon disponible.</div>':S.lessons.map(l=>{const cls=S.classes.find(c=>c.id===l.classId);return`<div class="card" style="cursor:pointer" onclick="startChrono('${l.id}')"><div style="flex:1"><div class="card-title">${esc(l.name)}</div><div class="card-sub">${cls?esc(cls.name):'—'} · ${l.runs.map(r=>r.dist+'m').join(' + ')}</div></div><span style="font-size:28px;color:#22c55e">▶</span></div>`;}).join('')}</div>`;
+}
+function startChrono(lid){S.chrScreen='timing';S.chrLessonId=lid;const les=S.lessons.find(l=>l.id===lid);S.chrGroupId=les?.groups[0]?.id||null;S.chrRunIdx=0;S.chrView='timing';startTimer();render();}
+function startTimer(){stopTimer();timerInt=setInterval(tickTimer,100);}
+function stopTimer(){if(timerInt){clearInterval(timerInt);timerInt=null;}}
+function tickTimer(){
+  const sk=sesKey();const ses=S.sessions[sk];if(!ses?.startTs)return;
+  const el=document.getElementById('elapsed-main');if(el)el.textContent=fmtT(Date.now()-ses.startTs);
+  document.querySelectorAll('[id^="lt-"]').forEach(e=>e.textContent=fmtT(Date.now()-ses.startTs));
+}
+
+function renderChronoTiming(m){
+  const les=S.lessons.find(l=>l.id===S.chrLessonId);if(!les){S.chrScreen='pick';render();return;}
+  const cls=S.classes.find(c=>c.id===les.classId);
+  m.innerHTML=`<div class="back-bar"><button class="back-btn" onclick="leaveChrono()">← Leçons</button>
+<span class="back-title" style="max-width:160px">${esc(les.name)}</span>
+<button class="back-btn" onclick="toggleView()">${S.chrView==='timing'?'Résultats 📊':'← Chrono'}</button></div>
+<div class="tab-strip" id="run-tabs">${les.runs.map((r,i)=>`<button class="tab-pill${S.chrRunIdx===i?' active':''}" style="${S.chrRunIdx===i?'background:#0f172a;border-color:#0f172a;color:#fff':''}" onclick="setChrRun(${i})">Course ${i+1} – ${r.dist}m</button>`).join('')}</div>
+<div class="tab-strip" style="background:#fff" id="grp-tabs">${les.groups.map((g,gi)=>`<button class="tab-pill${S.chrGroupId===g.id?' active':''}" style="${S.chrGroupId===g.id?`background:${GCOL[gi]};border-color:${GCOL[gi]}`:''}" onclick="setChrGroup('${g.id}')" data-gid="${g.id}">Groupe ${g.id}</button>`).join('')}</div>
+<div id="chr-body"></div>`;
+  renderChrBody(les,cls);
+}
+function renderChrBody(les,cls){
+  const el=document.getElementById('chr-body');if(!el)return;
+  if(S.chrView==='results'){renderResults(el,les,cls);return;}
+  const grp=les.groups.find(g=>g.id===S.chrGroupId);
+  const run=les.runs[S.chrRunIdx];
+  const sk=sesKey();
+  const ses=S.sessions[sk]||{startTs:null,finishes:{},status:{}};
+  const started=!!ses.startTs;
+  const grpStudents=(grp?.studentIds||[]).map(id=>cls?.students.find(s=>s.id===id)).filter(Boolean);
+  const finCount=grpStudents.filter(s=>ses.finishes[s.id]&&!ses.status?.[s.id]).length;
+  const activeCount=grpStudents.filter(s=>!ses.status?.[s.id]).length;
+  let statusHtml=!started
+    ?`<div style="padding:10px 12px"><button class="btn-start" onclick="doDepart()">🚀 DÉPART — Groupe ${S.chrGroupId} · ${run.dist} m</button></div>`
+    :`<div class="status-bar"><div><div style="font-size:14px;font-weight:600;color:#16a34a">✓ ${finCount} / ${activeCount} arrivés</div>${finCount===activeCount&&activeCount>0?'<div style="font-size:12px;color:#16a34a;font-weight:700;margin-top:2px">Groupe terminé ! 🎉</div>':''}</div><div style="display:flex;align-items:center;gap:10px"><span class="elapsed" id="elapsed-main">${fmtT(Date.now()-ses.startTs)}</span><button class="btn-d" style="padding:8px 12px" onclick="resetSes()">↺</button></div></div>`;
+  const cardsHtml=grpStudents.map(st=>{
+    const st_status=ses.status?.[st.id];
+    const finTs=ses.finishes[st.id];
+    const done=!!finTs&&!st_status;
+    const running=started&&!done&&!st_status;
+    const ms=done?finTs-ses.startTs:null;
+    if(st_status==='abs')return`<div class="stu-card absent"><div class="stu-name">${esc(st.name)}</div><div style="font-size:20px;margin:4px 0">✕</div><div style="font-size:11px;font-weight:700;color:#94a3b8;letter-spacing:.5px">ABSENT</div><button class="undo-btn" onclick="clearStatus('${st.id}')">↺ effacer</button></div>`;
+    if(st_status==='np')return`<div class="stu-card np"><div class="stu-name">${esc(st.name)}</div><div style="font-size:20px;margin:4px 0">✕</div><div style="font-size:11px;font-weight:700;color:#ca8a04;letter-spacing:.5px">NE PRATIQUE PAS</div><button class="undo-btn" onclick="clearStatus('${st.id}')">↺ effacer</button></div>`;
+    return`<div class="stu-card ${done?'done':running?'running':'waiting'}" id="scard-${st.id}" ${running?`onclick="finishStudent('${st.id}')"`:''}>
+<div class="stu-name">${esc(st.name)}</div>
+${done?`<div class="stu-time" style="color:#16a34a">${fmtT(ms)}</div><div class="stu-speed" style="color:#0d9488">${fmtV(run.dist,ms)||''}</div><div class="stu-pace">${fmtP(run.dist,ms)?fmtP(run.dist,ms)+'/km':''}</div><button class="undo-btn" onclick="event.stopPropagation();undoFinish('${st.id}')">↺ annuler</button>`
+:running?`<div class="stu-time" style="color:#d97706" id="lt-${st.id}">${fmtT(Date.now()-ses.startTs)}</div><div class="stu-hint">TAP pour arriver</div>`
+:`<div class="stu-wait-txt">En attente</div><div class="status-btns"><button class="sbtn sbtn-abs" onclick="event.stopPropagation();setStatus('${st.id}','abs')">ABS</button><button class="sbtn sbtn-np" onclick="event.stopPropagation();setStatus('${st.id}','np')">NP</button></div>`}
+</div>`;
+  }).join('');
+  el.innerHTML=statusHtml+`<div class="grid2">${cardsHtml||'<div style="grid-column:1/-1"><div class="empty">Aucun élève dans ce groupe.</div></div>'}</div>`;
+}
+
+/* ── Chrono actions ── */
+function sesKey(){return`${S.chrLessonId}__${S.chrGroupId}__${S.chrRunIdx}`;}
+function getOrCreateSes(){const sk=sesKey();if(!S.sessions[sk])S.sessions[sk]={startTs:null,finishes:{},status:{}};if(!S.sessions[sk].status)S.sessions[sk].status={};return S.sessions[sk];}
+function doDepart(){const ses=getOrCreateSes();if(ses.startTs)return;ses.startTs=Date.now();saveSes();const les=S.lessons.find(l=>l.id===S.chrLessonId),cls=S.classes.find(c=>c.id===les?.classId);renderChrBody(les,cls);}
+function finishStudent(sid){
+  const sk=sesKey();const ses=S.sessions[sk];if(!ses?.startTs||ses.finishes[sid])return;
+  ses.finishes[sid]=Date.now();saveSes();
+  const les=S.lessons.find(l=>l.id===S.chrLessonId),cls=S.classes.find(c=>c.id===les?.classId),run=les.runs[S.chrRunIdx];
+  const ms=ses.finishes[sid]-ses.startTs;
+  const card=document.getElementById('scard-'+sid);
+  if(card){card.className='stu-card done';card.onclick=null;card.innerHTML=`<div class="stu-name">${esc(cls?.students.find(s=>s.id===sid)?.name||sid)}</div><div class="stu-time" style="color:#16a34a">${fmtT(ms)}</div><div class="stu-speed" style="color:#0d9488">${fmtV(run.dist,ms)||''}</div><div class="stu-pace">${fmtP(run.dist,ms)?fmtP(run.dist,ms)+'/km':''}</div><button class="undo-btn" onclick="event.stopPropagation();undoFinish('${sid}')">↺ annuler</button>`;}
+  const grp=les.groups.find(g=>g.id===S.chrGroupId);
+  const grpStudents=(grp?.studentIds||[]).map(id=>cls?.students.find(s=>s.id===id)).filter(Boolean);
+  const activeStu=grpStudents.filter(s=>!ses.status?.[s.id]);
+  const finCount=activeStu.filter(s=>ses.finishes[s.id]).length;
+  const cnt=document.querySelector('.status-bar div div:first-child');
+  if(cnt)cnt.textContent=`✓ ${finCount} / ${activeStu.length} arrivés`;
+}
+function undoFinish(sid){const sk=sesKey();const ses=S.sessions[sk];if(!ses)return;delete ses.finishes[sid];saveSes();const les=S.lessons.find(l=>l.id===S.chrLessonId),cls=S.classes.find(c=>c.id===les?.classId);renderChrBody(les,cls);}
+function setStatus(sid,status){const ses=getOrCreateSes();ses.status[sid]=status;saveSes();const les=S.lessons.find(l=>l.id===S.chrLessonId),cls=S.classes.find(c=>c.id===les?.classId);renderChrBody(les,cls);}
+function clearStatus(sid){const sk=sesKey();const ses=S.sessions[sk];if(!ses)return;delete ses.status[sid];saveSes();const les=S.lessons.find(l=>l.id===S.chrLessonId),cls=S.classes.find(c=>c.id===les?.classId);renderChrBody(les,cls);}
+function resetSes(){if(!confirm('Réinitialiser ?'))return;const sk=sesKey();delete S.sessions[sk];saveSes();const les=S.lessons.find(l=>l.id===S.chrLessonId),cls=S.classes.find(c=>c.id===les?.classId);renderChrBody(les,cls);}
+function setChrRun(i){S.chrRunIdx=i;document.querySelectorAll('#run-tabs .tab-pill').forEach((b,j)=>{b.classList.toggle('active',j===i);b.style.background=j===i?'#0f172a':'';b.style.borderColor=j===i?'#0f172a':'';b.style.color=j===i?'#fff':'';});const les=S.lessons.find(l=>l.id===S.chrLessonId),cls=S.classes.find(c=>c.id===les?.classId);renderChrBody(les,cls);}
+function setChrGroup(gid){S.chrGroupId=gid;const les=S.lessons.find(l=>l.id===S.chrLessonId);les.groups.forEach((g,gi)=>{const btn=document.querySelector(`#grp-tabs [data-gid="${g.id}"]`);if(!btn)return;const a=g.id===gid;btn.classList.toggle('active',a);btn.style.background=a?GCOL[gi]:'';btn.style.borderColor=a?GCOL[gi]:'';btn.style.color=a?'#fff':'';});const cls=S.classes.find(c=>c.id===les?.classId);renderChrBody(les,cls);}
+function toggleView(){S.chrView=S.chrView==='timing'?'results':'timing';document.querySelector('.back-bar .back-btn:last-child').textContent=S.chrView==='timing'?'Résultats 📊':'← Chrono';const les=S.lessons.find(l=>l.id===S.chrLessonId),cls=S.classes.find(c=>c.id===les?.classId);renderChrBody(les,cls);}
+function leaveChrono(){stopTimer();S.chrScreen='pick';render();}
+
+/* ── Cell data helper ── */
+function getCellData(les,cls,st,ri){
+  const grp=les.groups.find(g=>g.studentIds.includes(st.id));if(!grp)return{type:'nogrp'};
+  const sk=`${S.chrLessonId}__${grp.id}__${ri}`;const ses=S.sessions[sk];
+  if(!ses?.startTs)return{type:'noses'};
+  const status=ses.status?.[st.id];if(status)return{type:status};
+  const finTs=ses.finishes[st.id];if(!finTs)return{type:'notime'};
+  const ms=finTs-ses.startTs;const run=les.runs[ri];
+  return{type:'ok',ms,time:fmtT(ms),speed:fmtV(run.dist,ms),speedVal:fmtVNum(run.dist,ms)};
+}
+
+/* ── Results table ── */
+function renderResults(el,les,cls){
+  const hasAny=les.runs.some((_,ri)=>les.groups.some(g=>{const sk=`${S.chrLessonId}__${g.id}__${ri}`;return S.sessions[sk]?.startTs;}));
+  const viewToggle=`<div class="toggle-view"><button class="tvbtn active" onclick="void 0">📋 Tableau</button></div>`;
+  if(!hasAny){el.innerHTML=viewToggle+'<div class="empty">Aucun résultat pour cette leçon.</div>';renderAwards(el,les,cls);return;}
+  const runHdrs=les.runs.map((r,i)=>`<th>C${i+1}<br><span style="font-weight:400;color:#64748b">${r.dist}m</span></th>`).join('');
+  let html=viewToggle;
+  les.groups.forEach((g,gi)=>{
+    const students=(g.studentIds||[]).map(id=>cls?.students.find(s=>s.id===id)).filter(Boolean);
+    if(!students.length)return;
+    html+=`<div class="grp-hdr" style="color:${GCOL[gi]}">Groupe ${g.id}<span class="grp-count">${students.length} élèves</span></div>`;
+    html+=`<div class="res-wrap"><table class="res-table"><thead><tr><th>#</th><th>Nom</th>${runHdrs}<th>Moy.</th></tr></thead><tbody>`;
+    students.forEach((st,idx)=>{
+      const cells=les.runs.map((_,ri)=>{
+        const d=getCellData(les,cls,st,ri);
+        if(d.type==='ok')return`<td><div class="td-time">${d.time}</div><div class="td-speed">${d.speed||''}</div></td>`;
+        if(d.type==='abs')return`<td><span class="td-cross abs" title="Absent">✕</span><div style="font-size:10px;color:#fca5a5;font-weight:700">ABS</div></td>`;
+        if(d.type==='np')return`<td><span class="td-cross np" title="Ne pratique pas">✕</span><div style="font-size:10px;color:#ca8a04;font-weight:700">NP</div></td>`;
+        return`<td><span class="td-dash">—</span></td>`;
+      });
+      const validSpeeds=les.runs.map((_,ri)=>getCellData(les,cls,st,ri)).filter(d=>d.type==='ok').map(d=>d.speedVal).filter(Boolean);
+      const avg=validSpeeds.length?validSpeeds.reduce((a,b)=>a+b,0)/validSpeeds.length:null;
+      html+=`<tr><td class="td-num">${idx+1}</td><td class="td-name">${esc(st.name)}</td>${cells.join('')}<td>${avg?`<div class="td-avg">${avg.toFixed(1)}<span style="font-size:11px;font-weight:400;color:#94a3b8"> km/h</span></div>`:'<span class="td-dash">—</span>'}</td></tr>`;
+    });
+    html+=`</tbody></table></div>`;
+  });
+  el.innerHTML=html;
+  renderAwards(el,les,cls);
+}
+
+/* ── Awards ceremony ── */
+function renderAwards(el,les,cls){
+  // Gather all student data
+  const allData=[];
+  cls?.students.forEach(st=>{
+    const grp=les.groups.find(g=>g.studentIds.includes(st.id));if(!grp)return;
+    const cells=les.runs.map((_,ri)=>getCellData(les,cls,st,ri));
+    const valid=cells.filter(d=>d.type==='ok');if(!valid.length)return;
+    const speeds=valid.map(d=>d.speedVal);
+    const avg=speeds.reduce((a,b)=>a+b,0)/speeds.length;
+    const maxSpd=Math.max(...speeds),minSpd=Math.min(...speeds);
+    const variance=speeds.length>1?speeds.reduce((a,b)=>a+(b-avg)**2,0)/speeds.length:0;
+    const firstSpd=cells.find(d=>d.type==='ok')?.speedVal;
+    const lastIdx=[...cells].reverse().findIndex(d=>d.type==='ok');
+    const lastSpd=lastIdx>=0?cells[cells.length-1-lastIdx]?.speedVal:null;
+    // finish timestamps for ordering
+    const finTimes=valid.map((d,ri)=>{const sk=`${S.chrLessonId}__${grp.id}__${ri}`;const ses=S.sessions[sk];return ses?.finishes[st.id]||null;}).filter(Boolean);
+    allData.push({name:st.name,speeds,avg,maxSpd,minSpd,std:Math.sqrt(variance),progression:firstSpd&&lastSpd?lastSpd-firstSpd:null,runCount:valid.length,earliestFinish:finTimes.length?Math.min(...finTimes):null,latestFinish:finTimes.length?Math.max(...finTimes):null});
+  });
+  if(allData.length<2){return;}
+  const awards=[];
+  // 1. Fastest (max speed any run)
+  const fastest=allData.reduce((a,b)=>b.maxSpd>a.maxSpd?b:a);
+  awards.push({emoji:'🚀',color:'#fbbf24',title:'Prix Turbo',name:fastest.name,desc:`${fastest.maxSpd.toFixed(1)} km/h – l'avion de la piste`});
+  // 2. Slowest
+  const slowest=allData.reduce((a,b)=>b.minSpd<a.minSpd?b:a);
+  if(slowest.name!==fastest.name)awards.push({emoji:'🐢',color:'#6ee7b7',title:'Prix Tortue Philosophe',name:slowest.name,desc:`${slowest.minSpd.toFixed(1)} km/h – pourquoi courir quand on peut contempler ?`});
+  // 3. Most consistent (min std dev, at least 2 runs)
+  const consistent=allData.filter(d=>d.runCount>=2).reduce((a,b)=>b.std<a.std?b:a,allData.filter(d=>d.runCount>=2)[0]);
+  if(consistent)awards.push({emoji:'🎯',color:'#818cf8',title:'Prix Métronome Humain',name:consistent.name,desc:`Écart de seulement ${consistent.std.toFixed(2)} km/h entre ses courses – une horloge suisse en chaussures de sport`});
+  // 4. Biggest progression
+  const progs=allData.filter(d=>d.progression!==null&&d.runCount>=2);
+  if(progs.length){const best=progs.reduce((a,b)=>b.progression>a.progression?b:a);if(best.progression>0)awards.push({emoji:'🔥',color:'#fb923c',title:'Prix Diesel',name:best.name,desc:`+${best.progression.toFixed(1)} km/h entre la 1ère et la dernière course – lent au démarrage, inarrêtable à la fin`});}
+  // 5. Biggest drop
+  if(progs.length){const worst=progs.reduce((a,b)=>b.progression<a.progression?b:a);if(worst.progression<0)awards.push({emoji:'🎈',color:'#f9a8d4',title:'Prix du Soufflé',name:worst.name,desc:`${worst.progression.toFixed(1)} km/h – tout dans le premier tour, rien dans le dernier`});}
+  // 6. Most inconsistent
+  const inconsistent=allData.filter(d=>d.runCount>=2).reduce((a,b)=>b.std>a.std?b:a,allData.filter(d=>d.runCount>=2)[0]);
+  if(inconsistent&&consistent&&inconsistent.name!==consistent.name)awards.push({emoji:'🎲',color:'#c4b5fd',title:'Prix Roulette Russe',name:inconsistent.name,desc:`${inconsistent.std.toFixed(2)} km/h d'écart – jamais deux fois la même personne`});
+  // 7. Best average
+  const bestAvg=allData.reduce((a,b)=>b.avg>a.avg?b:a);
+  if(bestAvg.name!==fastest.name)awards.push({emoji:'🏅',color:'#fde68a',title:'Prix Fond de Commerce',name:bestAvg.name,desc:`${bestAvg.avg.toFixed(1)} km/h de moyenne – la régularité du champion`});
+  // 8. Funny – most runs completed
+  const mostRuns=allData.reduce((a,b)=>b.runCount>a.runCount?b:a);
+  if(mostRuns.runCount===les.runs.length&&allData.filter(d=>d.runCount===les.runs.length).length===1)awards.push({emoji:'💪',color:'#6ee7b7',title:'Prix Tout Terrain',name:mostRuns.name,desc:`${mostRuns.runCount}/${les.runs.length} courses bouclées – mème pas essoufflé`});
+  const div=document.createElement('div');
+  div.className='awards-wrap';
+  div.innerHTML=`<button class="awards-btn" id="awards-toggle" onclick="toggleAwards()">🏆 Remise des prix — cliquer pour révéler</button><div id="awards-list" style="display:none">${awards.map(a=>`<div class="award-card" style="border-left-color:${a.color}"><div style="display:flex;gap:12px;align-items:center"><span class="award-emoji">${a.emoji}</span><div><div class="award-title">${a.title}</div><div class="award-name">${esc(a.name)}</div><div class="award-desc">${a.desc}</div></div></div></div>`).join('')}</div>`;
+  el.appendChild(div);
+}
+function toggleAwards(){const l=document.getElementById('awards-list'),b=document.getElementById('awards-toggle');if(l.style.display==='none'){l.style.display='block';b.textContent='🏆 Fermer la remise des prix';}else{l.style.display='none';b.textContent='🏆 Remise des prix — cliquer pour révéler';}}
+
+load();render();
+</script>
+</body>
+</html>
